@@ -164,14 +164,15 @@ For future schema changes, use a migration tool such as Flyway or Liquibase rath
 2. Create a new Web Service.
 3. Connect the GitHub repository.
 4. Select the `main` branch.
-5. Use the Java runtime and the repository's `render.yaml` values, or enter these manually:
+5. Select **Docker** as the runtime. The repository's `render.yaml` and `Dockerfile` configure the build automatically.
+6. If configuring manually, set:
 
 ```text
-Build command: ./mvnw clean package -DskipTests
-Start command: java -Dserver.port=$PORT -jar target/empowerher-0.0.1-SNAPSHOT.jar
+Dockerfile path: ./Dockerfile
+Docker build context: .
 ```
 
-The application reads the platform-provided `PORT`. Do not hardcode a public hosting port.
+Do not enter `yarn start`. This is a Dockerized Java/Spring Boot application. The multi-stage `Dockerfile` builds the JAR with Maven and starts it with Java. The application reads the platform-provided `PORT`; do not hardcode a public hosting port.
 
 ## 6. Configure private Render environment variables
 

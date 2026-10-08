@@ -1,10 +1,10 @@
 services:
   - type: web
     name: empowerher
-    runtime: java
+    runtime: docker
     plan: free
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -Dserver.port=$PORT -jar target/empowerher-0.0.1-SNAPSHOT.jar
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       - key: DB_URL
         sync: false
@@ -17,12 +17,14 @@ services:
       - key: SESSION_COOKIE_SECURE
         value: "true"
       - key: JPA_DDL_AUTO
-        value: validate
+        value: update
       - key: THYMELEAF_CACHE
         value: "true"
       - key: DEVTOOLS_RESTART_ENABLED
         value: "false"
       - key: DEVTOOLS_LIVERELOAD_ENABLED
+        value: "false"
+      - key: BOOTSTRAP_CREATE_DEFAULT_USERS
         value: "false"
       - key: MAIL_USERNAME
         sync: false

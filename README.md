@@ -61,4 +61,4 @@ See the complete [deployment guide](./DEPLOYMENT.md) for:
 - Free-tier upload limitations
 - Troubleshooting and rollback guidance
 
-The repository includes [render.yaml](./render.yaml) as a starting point. Configure database and SMTP values as private environment variables in the hosting dashboard; never put their values in `render.yaml` or GitHub.
+The repository includes [render.yaml](./render.yaml) and a multi-stage [Dockerfile](./Dockerfile) for a Docker-based Render web service. Configure database and SMTP values as private environment variables in the hosting dashboard; never put their values in `render.yaml` or GitHub.

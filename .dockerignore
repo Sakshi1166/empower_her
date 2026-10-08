@@ -1,0 +1,13 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+target
+logs
+uploads
+src/main/resources/static/uploads
+*.log
+*.gz
+README.md
+DEPLOYMENT.md
