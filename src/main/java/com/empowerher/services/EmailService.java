@@ -37,6 +37,9 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String systemEmail;
 
+    @Value("${app.public-url:http://localhost:8081}")
+    private String publicUrl;
+
     // Send Welcome Email to New User
     @Async
     public void sendWelcomeEmail(User user) {
@@ -46,8 +49,8 @@ public class EmailService {
             Context context = new Context();
             context.setVariable("name", user.getUsername());
             context.setVariable("email", user.getEmail());
-            context.setVariable("loginUrl", "http://localhost:8080/login");
-            context.setVariable("websiteUrl", "http://localhost:8080");
+            context.setVariable("loginUrl", publicUrl + "/login");
+            context.setVariable("websiteUrl", publicUrl);
             context.setVariable("supportEmail", "support@empowerher.com");
 
             String htmlContent = templateEngine.process("emails/welcome-email", context);
@@ -103,9 +106,9 @@ public class EmailService {
             context.setVariable("schemeLevel", scheme.getLevel());
             context.setVariable("schemeCategory", scheme.getCategory().getName());
             context.setVariable("applyLink", scheme.getApplyLink());
-            context.setVariable("schemeUrl", "http://localhost:8080/scheme/" + scheme.getId());
-            context.setVariable("websiteUrl", "http://localhost:8080");
-            context.setVariable("unsubscribeUrl", "http://localhost:8080/user/profile");
+            context.setVariable("schemeUrl", publicUrl + "/scheme/" + scheme.getId());
+            context.setVariable("websiteUrl", publicUrl);
+            context.setVariable("unsubscribeUrl", publicUrl + "/user/profile");
 
             String htmlContent = templateEngine.process("emails/new-scheme-notification", context);
 
@@ -125,7 +128,7 @@ public class EmailService {
             context.setVariable("userName", user.getUsername());
             context.setVariable("userEmail", user.getEmail());
             context.setVariable("registrationDate", user.getCreatedAt());
-            context.setVariable("adminUrl", "http://localhost:8080/admin/users");
+            context.setVariable("adminUrl", publicUrl + "/admin/users");
 
             String htmlContent = templateEngine.process("emails/admin-new-user", context);
 

@@ -10,11 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpMethod;
 import java.io.IOException;
 
 @Configuration
@@ -95,8 +95,21 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                 // User routes - require USER role  
                 .requestMatchers("/user/**").hasAuthority("ROLE_USER")
-                // API routes - permit all or add specific security
-                .requestMatchers("/api/**").permitAll()
+                // Public read-only API routes
+                .requestMatchers(HttpMethod.GET,
+                        "/api/schemes/**",
+                        "/api/categories/**",
+                        "/api/comments/**",
+                        "/api/share/**").permitAll()
+                // Administrative API mutations
+                .requestMatchers(HttpMethod.POST, "/api/schemes/**", "/api/categories/**")
+                        .hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/schemes/**", "/api/categories/**")
+                        .hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/schemes/**", "/api/categories/**")
+                        .hasAuthority("ROLE_ADMIN")
+                // User-generated content and counters require an authenticated user
+                .requestMatchers("/api/comments/**", "/api/share/**").authenticated()
                 // All other routes require authentication
                 .anyRequest().authenticated()
             )
@@ -110,7 +123,7 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
@@ -119,15 +132,7 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception
                 .accessDeniedPage("/access-denied")
             )
-            .csrf(csrf -> csrf
-                // CSRF configuration for different endpoints
-                .ignoringRequestMatchers(
-                    "/api/**",           // APIs के लिए CSRF disable
-                    "/user/bookmark/**", // Bookmark APIs
-                    "/api/share/**",     // Share APIs
-                    "/api/comments/**"   // Comment APIs
-                )
-            )
+            .csrf(csrf -> {})
             .authenticationProvider(authenticationProvider());
 
         return http.build();

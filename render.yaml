@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: empowerher
+    runtime: java
+    plan: free
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -Dserver.port=$PORT -jar target/empowerher-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: APP_PUBLIC_URL
+        sync: false
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
+      - key: JPA_DDL_AUTO
+        value: validate
+      - key: THYMELEAF_CACHE
+        value: "true"
+      - key: DEVTOOLS_RESTART_ENABLED
+        value: "false"
+      - key: DEVTOOLS_LIVERELOAD_ENABLED
+        value: "false"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false

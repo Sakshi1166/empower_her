@@ -4,6 +4,15 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Local runtime data and secrets
+.env
+.env.*
+!.env.example
+application-local.properties
+logs/
+uploads/
+src/main/resources/static/uploads/
+
 ### STS ###
 .apt_generated
 .classpath

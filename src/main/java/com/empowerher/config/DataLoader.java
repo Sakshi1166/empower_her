@@ -7,6 +7,7 @@ import com.empowerher.repositories.CategoryRepository;
 import com.empowerher.repositories.SchemeRepository;
 import com.empowerher.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -28,16 +29,33 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${app.bootstrap.create-default-users:false}")
+    private boolean createDefaultUsers;
+
+    @Value("${app.bootstrap.admin-username:}")
+    private String adminUsername;
+
+    @Value("${app.bootstrap.admin-password:}")
+    private String adminPassword;
+
+    @Value("${app.bootstrap.user-username:}")
+    private String userUsername;
+
+    @Value("${app.bootstrap.user-password:}")
+    private String userPassword;
+
     @Override
     public void run(String... args) throws Exception {
         System.out.println("=== INITIALIZING EMPOWERHER DATABASE ===");
         
         try {
             // Only create data if database is empty
-            if (userRepository.count() == 0) {
+            if (userRepository.count() == 0 && createDefaultUsers) {
                 createDefaultUsers();
             } else {
-                System.out.println("✓ Users already exist in database");
+                System.out.println(createDefaultUsers
+                        ? "✓ Users already exist in database"
+                        : "✓ Default user bootstrap is disabled");
             }
             
             if (categoryRepository.count() == 0) {
@@ -53,11 +71,6 @@ public class DataLoader implements CommandLineRunner {
             }
             
             System.out.println("=== DATABASE INITIALIZATION COMPLETE ===");
-            System.out.println("=== DEFAULT LOGIN CREDENTIALS ===");
-            System.out.println("ADMIN: admin / admin123");
-            System.out.println("USER:  user  / user123");
-            System.out.println("==================================");
-            
         } catch (Exception e) {
             System.err.println("ERROR during database initialization: " + e.getMessage());
             System.out.println("Continuing application startup without initial data...");
@@ -66,11 +79,17 @@ public class DataLoader implements CommandLineRunner {
 
     private void createDefaultUsers() {
         try {
+            if (adminUsername.isBlank() || adminPassword.isBlank()
+                    || userUsername.isBlank() || userPassword.isBlank()) {
+                throw new IllegalStateException(
+                        "Default user bootstrap requires all BOOTSTRAP_* username and password values");
+            }
+
             // Create admin user
             User admin = new User();
-            admin.setUsername("admin");
+            admin.setUsername(adminUsername);
             admin.setEmail("admin@empowerher.com");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setPassword(passwordEncoder.encode(adminPassword));
             admin.setRole("ROLE_ADMIN");
             admin.setEnabled(true);
             admin.setCreatedAt(LocalDateTime.now());
@@ -78,9 +97,9 @@ public class DataLoader implements CommandLineRunner {
 
             // Create sample user
             User user = new User();
-            user.setUsername("user");
+            user.setUsername(userUsername);
             user.setEmail("user@empowerher.com");
-            user.setPassword(passwordEncoder.encode("user123"));
+            user.setPassword(passwordEncoder.encode(userPassword));
             user.setRole("ROLE_USER");
             user.setEnabled(true);
             user.setCreatedAt(LocalDateTime.now());
